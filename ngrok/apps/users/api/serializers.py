@@ -41,6 +41,16 @@ class TestUserSerializer(serializers.Serializer): # ahora en lugar de un modelo,
 		# 	raise serializers.ValidationError('El mail no puede contener el nombre') # mario no puede poner mario@gmail.com por ejemplo
 		# print('validate general')
 		return data
+	
+
+	def create(self,validated_data): #informacion valida q le hemos pasado, si nos damos cuentas .save() esta dentro del validador
+		#print(validated_data)
+		#return User(**validated_data) # pasamos ese objeto informacion valida con el "**"", con el ** nos devolvera los valores en el orden en que esten 
+		#es User pq es la infomacion que la damos en la clase meta el modelo q le pasamos ln 8, el modelo al final es una clase una instacia
+		return User.objects.create(**validated_data) #ORM de django, la info q le enviamos el ya sabe q debemos asignarlo como un insert into, con los valore sy la info, siendo user un modelo accedemos a objects y despues a create
+# registro en la bd con la inf validada y me retorna su instancia
+#Y SE CREA EL NUEVO USUARIO 5 CON NAME DEVELOP Y TEST@GMAIL.COM
+
 
 # si ponemos el "raise serializers.ValidationError('El mail no puede contener el nombre')" comparando los campos entre si, y accediendo entre ellos:
 #{'email': [ErrorDetail(string='El mail no puede contener el nombre', code='invalid')]}

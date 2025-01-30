@@ -14,14 +14,16 @@ def user_api_view(request): #nombre de la funcion es el titulo  #recibe la heren
     if request.method == 'GET': #def get(get,request): # peticion q me envie cualquier front cuando teniamos la clase
         users = User.objects.all()  # es decir todos los usuarios, no devulve un unico valor sino un listado de valores
         users_serializer = UserSerializer(users, many=True) # y le paso la consulta, como tiene varios valores usamos "many", convertirá a json cada uno d elos elementos del listado
-        print(TestUserSerializer())
+        #print(TestUserSerializer())
         test_data ={ # crear una instancia de testuserserializer y enviarle una informacion de prueba
             'name': 'develop',
-            'email': 'develop@gmail.com'
+            'email': 'test@gmail.com'
         }        
         test_user = TestUserSerializer(data = test_data, context = test_data ) # context en caso de que queramos comparar valores dentro del modelo  otras opciones
         if test_user.is_valid():
-            print('Paso validaciones')
+            user_instance= test_user.save() # para activar el el def create de testUserSerializers, si pones un print ahora aparecera
+            print(user_instance, 'Paso validaciones') # instancia q devolvemos en el create en Serializers, lo q nos devuelve el return
+            # velop none, self.name y self.lastanem respectivamente, en modelos dentro de la clase user, su def __str__
         else:
             print(test_user.errors)
 
@@ -34,7 +36,7 @@ def user_api_view(request): #nombre de la funcion es el titulo  #recibe la heren
         
         #validacion
         if user_serializer.is_valid(): # hacemos una validacion, si esta correcto avanzamos
-            user_serializer.save() # y lo guardamos
+            user_serializer.save() # y lo guardamos => no llama la bd de forma directa pasa por un metodo de los serializadores: CREATE 
             return Response({'message':'Usuario creado correctamente!'}, status = status.HTTP_201_CREATED) # cuando el serializador guarda la info la pone en una varibale llamada DATA, user_serializer.data, poner los datos del usuario creado o un mensaje simple {'message':'Usuario Eliminado correctamente!'}
 #DATA PUEDE guardar: la informacion serializada cuando se envia una serie de parametros para get y la creacion de la informacion tambien serializada 
 # se registra se serializa y se manda a data
@@ -60,7 +62,7 @@ def user_detail_api_view(request,pk): #el pk lo introduce en la url, 1 el primer
             #user = User.objects.filter(id = pk).first() añadimos un caso comun arriba del if 
             user_serializer = UserSerializer(user,data = request.data)
             if user_serializer.is_valid():
-                user_serializer.save() # viene ya la accion realizada de rest framework, es decir estamos sobreescribiendo el dato en el campo automaticamente
+                user_serializer.save() # viene ya la accion realizada de rest framework, es decir estamos sobreescribiendo el dato en el campo automaticamente, DEF CREATE(SELF,VALIDATED_DATA)
                 return Response(user_serializer.data,  status = status.HTTP_200_OK)
             return Response(user_serializer.errors,  status = status.HTTP_400_BAD_REQUEST)
 
@@ -70,3 +72,6 @@ def user_detail_api_view(request,pk): #el pk lo introduce en la url, 1 el primer
             return Response({'message':'Usuario Eliminado correctamente!'},status = status.HTTP_200_OK )   #no podemos enseñar los datos obviamente por lo que ponemos un mensaje
 
     return Response({'message':'No se ha encontrado un usuario con estos datos'},status = status.HTTP_400_BAD_REQUEST )    # en caso de que no haya usuario con esos datos
+
+
+
