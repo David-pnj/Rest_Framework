@@ -1,6 +1,6 @@
 from rest_framework.views import APIView # ya no se llama view sino apiview
 from apps.users.models import User
-from apps.users.api.serializers import UserSerializer, TestUserSerializer 
+from apps.users.api.serializers import UserSerializer#, TestUserSerializer 
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -12,21 +12,8 @@ def user_api_view(request): #nombre de la funcion es el titulo  #recibe la heren
 
     #list
     if request.method == 'GET': #def get(get,request): # peticion q me envie cualquier front cuando teniamos la clase
-        users = User.objects.all()  # es decir todos los usuarios, no devulve un unico valor sino un listado de valores
-        users_serializer = UserSerializer(users, many=True) # y le paso la consulta, como tiene varios valores usamos "many", convertirá a json cada uno d elos elementos del listado
-        #print(TestUserSerializer())
-        test_data ={ # crear una instancia de testuserserializer y enviarle una informacion de prueba
-            'name': 'develop',
-            'email': 'test@gmail.com'
-        }        
-        test_user = TestUserSerializer(data = test_data, context = test_data ) # context en caso de que queramos comparar valores dentro del modelo  otras opciones
-        if test_user.is_valid():
-            user_instance= test_user.save() # para activar el el def create de testUserSerializers, si pones un print ahora aparecera
-            print(user_instance, 'Paso validaciones') # instancia q devolvemos en el create en Serializers, lo q nos devuelve el return
-            # velop none, self.name y self.lastanem respectivamente, en modelos dentro de la clase user, su def __str__
-        else:
-            print(test_user.errors)
-
+        users = User.objects.all().values('id','username','email','password')  # es decir todos los usuarios, no devulve un unico valor sino un listado de valores
+        users_serializer = UserSerializer(users, many=True) # y le paso la consulta, como tiene varios valores usamos "many", convertirá a json cada uno d elos elementos del listado    
         return Response(users_serializer.data, status=status.HTTP_200_OK) # no puedes enviar la variable de forma directa se encuantra en un atributo llamado data
     
     #create
@@ -58,9 +45,9 @@ def user_detail_api_view(request,pk): #el pk lo introduce en la url, 1 el primer
             user_serializer = UserSerializer(user) # no ponemos "many" pues se trata de un solo valor
             return Response(user_serializer.data, status = status.HTTP_200_OK) #serializer.data para siempre a cceder a la info dentro del serializer (igual que .text si fuera un string o .json() asus respectivos datos)
         
-        elif request.method == 'PUT':
+        elif request.method == 'PUT': # UPDATE SERIALIZER AHORA 
             #user = User.objects.filter(id = pk).first() añadimos un caso comun arriba del if 
-            user_serializer = UserSerializer(user,data = request.data)
+            user_serializer = UserSerializer( user,data = request.data) # antiguo testuserserializer 
             if user_serializer.is_valid():
                 user_serializer.save() # viene ya la accion realizada de rest framework, es decir estamos sobreescribiendo el dato en el campo automaticamente, DEF CREATE(SELF,VALIDATED_DATA)
                 return Response(user_serializer.data,  status = status.HTTP_200_OK)
@@ -75,3 +62,25 @@ def user_detail_api_view(request,pk): #el pk lo introduce en la url, 1 el primer
 
 
 
+#textUserSerializer SIEMPRE Q HAGAMOS UN APRIBE PROPIOA DE SERILIZER(CREATE, UPDATE..)
+
+
+# CREATE SERIALIZER CON VALIDATION PREVIA
+# if request.method == 'GET': #def get(get,request): # peticion q me envie cualquier front cuando teniamos la clase
+#         users = User.objects.all()  # es decir todos los usuarios, no devulve un unico valor sino un listado de valores
+#         users_serializer = UserSerializer(users, many=True) # y le paso la consulta, como tiene varios valores usamos "many", convertirá a json cada uno d elos elementos del listado
+#         #print(TestUserSerializer())
+#         test_data ={ # crear una instancia de testuserserializer y enviarle una informacion de prueba
+#             'name': 'develop',
+#             'email': 'test@gmail.com'
+#         }        
+#         test_user = TestUserSerializer(data = test_data, context = test_data ) # context en caso de que queramos comparar valores dentro del modelo  otras opciones
+#         if test_user.is_valid():
+#             user_instance= test_user.save() # para activar el el def create de testUserSerializers, si pones un print ahora aparecera
+#             print(user_instance, 'Paso validaciones') # instancia q devolvemos en el create en Serializers, lo q nos devuelve el return
+#             # velop none, self.name y self.lastanem respectivamente, en modelos dentro de la clase user, su def __str__
+#         else:
+#             print(test_user.errors)
+
+#         return Response(users_serializer.data, status=status.HTTP_200_OK) # no puedes enviar la variable de forma directa se encuantra en un atributo llamado data
+    

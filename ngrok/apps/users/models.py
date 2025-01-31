@@ -50,3 +50,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 	
 	def __str__(self):
 		return f'{self.name} {self.last_name}'
+	
+	# def save(self, *args, **kwargs):
+	# 	print('hoooolllaaaaaaaaaaaaaaaaa') # en caso de que hagamos un .save() en el update de serializer vendremos aqui pues es el save del modelo
+
+	# 	# RESUEMINEDO  cuando un serializar llama a su .save() llama al punto save del serializador, cuando haces un update de una instancia en el serializador hacemos referencia al modelo a su save
